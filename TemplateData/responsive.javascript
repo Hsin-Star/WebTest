@@ -59,7 +59,12 @@
         if (canvas){
             gCanvasElement = canvas;
             registerCanvasWatcher();
-
+            
+            new MutationObserver(function (attributesMutation) {
+                this.disconnect();
+                setTimeout(setDimensions, 1)
+            }).observe(canvas, {attributes:true});
+            
             this.disconnect();
         }
     }).observe(gameContainer, {childList:true});
