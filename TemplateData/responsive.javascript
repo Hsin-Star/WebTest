@@ -69,5 +69,4 @@
             this.disconnect();
         }
     }).observe(gameContainer, {childList:true});
-
 })();
