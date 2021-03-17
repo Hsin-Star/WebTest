@@ -1,13 +1,13 @@
 (function(){
     const q = (selector) => document.querySelector(selector);
 
-    const gCanvasElement = q('#unity-canvas');
-    const gameContainer = q('body')    
+    const gameContainer = q('#gameContainer');
 
-    const initialDimensions = {width: parseInt(gCanvasElement.style.width, 10), height: parseInt(gCanvasElement.style.height, 10)};
-
+    const initialDimensions = {width: parseInt(gameContainer.style.width, 10), height: parseInt(gameContainer.style.height, 10)};
     gameContainer.style.width = '100%';
     gameContainer.style.height = '100%';
+
+    let gCanvasElement = null;
 
     const getCanvasFromMutationsList = (mutationsList) => {
         for (let mutationItem of mutationsList){
@@ -22,24 +22,19 @@
 
     const setDimensions = () => {
         gameContainer.style.position = 'absolute';
-        gameContainer.style.overflow = 'hidden';
+        gCanvasElement.style.display = 'none';
         var winW = parseInt(window.getComputedStyle(gameContainer).width, 10);
         var winH = parseInt(window.getComputedStyle(gameContainer).height, 10);
-
-        const widthDim = initialDimensions.width == 0 ? minW : winW / initialDimensions.width;
-        const heightDim = initialDimensions.height == 0 ? winH : winH / initialDimensions.height;
-
-        var scale = Math.min(widthDim, heightDim);
-
+        var scale = Math.min(winW / initialDimensions.width, winH / initialDimensions.height);
         gCanvasElement.style.display = '';
-        gCanvasElement.style.overflow = 'hidden';
-        gCanvasElement.setAttribute('scrolling','no');
+        gCanvasElement.style.width = 'auto';
+        gCanvasElement.style.height = 'auto';
 
         var fitW = Math.round(initialDimensions.width * scale * 100) / 100;
         var fitH = Math.round(initialDimensions.height * scale * 100) / 100;
 
-        gCanvasElement.style.width = fitW + "px";
-        gCanvasElement.style.height = fitH + "px";
+        gCanvasElement.setAttribute('width', fitW);
+        gCanvasElement.setAttribute('height', fitH);
     }
 
     window.setDimensions = setDimensions;
@@ -56,11 +51,22 @@
         setDimensions();
     }
 
-    const i = 0;
-    registerCanvasWatcher();
+    window.UnityLoader.Error.handler = function () { }
 
-    new MutationObserver(function (attributesMutation) {
-        this.disconnect();
-        setTimeout(setDimensions, 1)                
-    }).observe(gameContainer, {attributes:true});
+    const i = 0;
+    new MutationObserver(function (mutationsList) {
+        const canvas = getCanvasFromMutationsList(mutationsList)
+        if (canvas){
+            gCanvasElement = canvas;
+            registerCanvasWatcher();
+
+            new MutationObserver(function (attributesMutation) {
+                this.disconnect();
+                setTimeout(setDimensions, 1)
+            }).observe(canvas, {attributes:true});
+
+            this.disconnect();
+        }
+    }).observe(gameContainer, {childList:true});
+
 })();
