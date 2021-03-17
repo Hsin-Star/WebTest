@@ -1,17 +1,13 @@
 (function(){
-    console.log('Responsive WebGL Template by SIMMER.io v2019.02.08');
-    console.log('Available at: https://assetstore.unity.com/packages/tools/gui/responsive-webgl-template-117308 for free!');
-    console.log('Host your WebGL Game at SIMMER.io for free!');
-
     const q = (selector) => document.querySelector(selector);
 
-    const gameContainer = q('#gameContainer');
+    const gCanvasElement = q('#unity-canvas');
+    const gameContainer = q('body')    
 
-    const initialDimensions = {width: parseInt(gameContainer.style.width, 10), height: parseInt(gameContainer.style.height, 10)};
+    const initialDimensions = {width: parseInt(gCanvasElement.style.width, 10), height: parseInt(gCanvasElement.style.height, 10)};
+
     gameContainer.style.width = '100%';
     gameContainer.style.height = '100%';
-
-    let gCanvasElement = null;
 
     const getCanvasFromMutationsList = (mutationsList) => {
         for (let mutationItem of mutationsList){
@@ -26,19 +22,24 @@
 
     const setDimensions = () => {
         gameContainer.style.position = 'absolute';
-        gCanvasElement.style.display = 'none';
+        gameContainer.style.overflow = 'hidden';
         var winW = parseInt(window.getComputedStyle(gameContainer).width, 10);
         var winH = parseInt(window.getComputedStyle(gameContainer).height, 10);
-        var scale = Math.min(winW / initialDimensions.width, winH / initialDimensions.height);
+
+        const widthDim = initialDimensions.width == 0 ? minW : winW / initialDimensions.width;
+        const heightDim = initialDimensions.height == 0 ? winH : winH / initialDimensions.height;
+
+        var scale = Math.min(widthDim, heightDim);
+
         gCanvasElement.style.display = '';
-        gCanvasElement.style.width = 'auto';
-        gCanvasElement.style.height = 'auto';
+        gCanvasElement.style.overflow = 'hidden';
+        gCanvasElement.setAttribute('scrolling','no');
 
         var fitW = Math.round(initialDimensions.width * scale * 100) / 100;
         var fitH = Math.round(initialDimensions.height * scale * 100) / 100;
 
-        gCanvasElement.setAttribute('width', fitW);
-        gCanvasElement.setAttribute('height', fitH);
+        gCanvasElement.style.width = fitW + "px";
+        gCanvasElement.style.height = fitH + "px";
     }
 
     window.setDimensions = setDimensions;
@@ -55,23 +56,11 @@
         setDimensions();
     }
 
-    window.UnityLoader.Error.handler = function () { }
-
     const i = 0;
-    new MutationObserver(function (mutationsList) {
-        const canvas = getCanvasFromMutationsList(mutationsList)
-        if (canvas){
-            gCanvasElement = canvas;
-            registerCanvasWatcher();
+    registerCanvasWatcher();
 
-            new MutationObserver(function (attributesMutation) {
-                this.disconnect();
-                setTimeout(setDimensions, 1)
-                q('.simmer').classList.add('hide');
-            }).observe(canvas, {attributes:true});
-
-            this.disconnect();
-        }
-    }).observe(gameContainer, {childList:true});
-
+    new MutationObserver(function (attributesMutation) {
+        this.disconnect();
+        setTimeout(setDimensions, 1)                
+    }).observe(gameContainer, {attributes:true});
 })();
