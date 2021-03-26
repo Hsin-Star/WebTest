@@ -32,3 +32,14 @@ $(document).keydown(function(event) {
     }
   }
 });
+
+
+function isMobileDevice(){
+    var mobileDevices = ['Android', 'webOS', 'iPhone', 'iPad', 'iPod', 'BlackBerry', 'Windows Phone'];
+    var isMobileDevice=false;
+    for(var i=0;i<mobileDevices.length;i++){
+        if(navigator.userAgent.match(mobileDevices[i])){
+            unityInstance.SendMessage("MobileDevice", "isMobileDevice", 1);
+        }
+    }
+}
