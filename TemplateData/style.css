@@ -28,6 +28,7 @@ a {
 .webgl-wrapper {
   width: 100%;
   max-width: 540px;
+  max-height: 960px;
   margin: auto;
   padding: auto;
   box-sizing: border-box;
