@@ -33,7 +33,6 @@ $(document).keydown(function(event) {
   }
 });
 
-
 function isMobileDevice(){
     var mobileDevices = ['Android', 'webOS', 'iPhone', 'iPad', 'iPod', 'BlackBerry', 'Windows Phone'];
     var isMobileDevice=false;
